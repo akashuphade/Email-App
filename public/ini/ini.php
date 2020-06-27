@@ -2,8 +2,8 @@
 
 define('BASE_PATH', realpath(dirname(__FILE__) . '/..'));
 define('SERVER',"{imap.gmail.com:993/imap/ssl}");
-define('USER', "uphade.akash25@gmail.com");
-define('PASSWORD', "bmkkkjnybxsfbbsd");
+define('USER', "USERNAME");
+define('PASSWORD', "PASSWORD");
 define('FOLDER', 'INBOX');
 
 
