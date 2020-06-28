@@ -1,24 +1,37 @@
 <?php
 
-ini_set("display_errors", 1);
-error_reporting(E_ALL);
-
 //Set execution time to max
 ini_set("max_execution_time", 0);
 
 use App\Classes\Email;
 
-require_once realpath("../vendor/autoload.php");
-require_once realpath("./inc/navbar.php");
+require_once(dirname(__FILE__) . "/ini/ini.php");
+require_once(dirname(__FILE__, 2) . "/vendor/autoload.php");
+require_once BASE_PATH . "/inc/navbar.php";
 
-$error = false;
+
+//Initialise the variables
+$readEmail = false;
+$action = 'unseen';
+
+//Check the action specified
+if (isset($_GET['action'])) {
+
+    $action = $_GET['action'];
+
+    if ($action === 'seen') {
+        $readEmail = true;
+    }
+
+}
+
+
+//Initialize the email object
+$emailObj = new Email();
+$emailObj->init();
 
 //On Submit check the action and perform it
-if (isset($_POST['mark_unread']) || isset($_POST['delete'])) {
-    
-    if (count($_POST) === 1) {
-        $error = true;
-    }
+if (isset($_POST['mark_read']) || isset($_POST['mark_unread']) || isset($_POST['delete'])) {
 
     //Get the modified values
     $checkedFields = array_filter($_POST, function($value){
@@ -27,38 +40,34 @@ if (isset($_POST['mark_unread']) || isset($_POST['delete'])) {
 
     $msgNumbers = implode(',', $checkedFields);
 
-    $emailObj = new Email();
-    $emailObj->init();
-
-    if (isset($_POST['mark_unread'])) {
+    //check the action and call function based on it
+    if (isset($_POST['mark_read'])) {
+        $emailObj->markAsRead($msgNumbers);
+    } else if (isset($_POST['mark_unread'])) {
         $emailObj->markAsUnread($msgNumbers);
+    } else {
+        $emailObj->deleteMails($msgNumbers);
     }
+
 } 
 
-$emailObj = new Email();
-$emailObj->init();
-$emailData = $emailObj->getEmails('uphade.akash25@gmail.com', true);
+//Get the email data
+$emailData = $emailObj->getEmails(EMAIL_TO_FILTER_FROM, $readEmail);
     
 ?>
     <div class="container mt-4 ml-4 mr-4">
-<?php 
-if ($error) { 
-?>
-        <div class="card card-body mb-4 mt-4 border border-danger">
+
+        <div id="error" class="card card-body mb-4 mt-4 border border-danger d-none">
             <span class="invalid-feedback  d-inline-block" role="alert">
                 <strong><ul><li><?php echo "Please select at least one email record" ?></li></ul></strong>
             </span>
         </div>
-<?php 
-        }
-?>
-    
-    
+        
         <div class="card">
-            <div class="card-header text-center"><h1>Unread Email List</h1></div>
+            <div class="card-header text-center"><h1><?php echo $action==='unseen' ? 'Unread Email List' : 'Read Email List' ?></h1></div>
      
             <div class="card-body">
-                <form action="#" method="POST">
+                <form action="#" method="POST" onsubmit="return formValidation();">
 
                 <table class="table table-bordered table-striped table-hover">
                     <thead>
@@ -98,7 +107,7 @@ foreach($emailData as $email) {
                 </tbody>
             </table>
                 <div class="mt-4 row justify-content-center">
-                    <button type="submit" name="mark_unread" class="btn btn-primary btn-sm">Mark as Unread</button>
+                    <button type="submit" name="<?php echo $action==='unseen' ? 'mark_read' : 'mark_unread' ?>" class="btn btn-primary btn-sm"><?php echo $action==='unseen' ? 'Mark as Read' : 'Mark as Unread' ?></button>
                     <button type="submit" name="delete" class="btn btn-danger btn-sm ml-2">Delete</button>
                 </div>
             </form>
@@ -112,6 +121,15 @@ foreach($emailData as $email) {
         $("#checkAll").change(function () {
             $("input:checkbox").prop('checked', $(this).prop("checked"));
         });
-    
     });
+
+    //VAlidate the form before action
+    function formValidation() {
+     
+        var len = document.querySelectorAll('.checkbox input[type="checkbox"]:checked').length;
+        if (len <= 0) {
+            $("#error").removeClass("d-none");
+            return false;
+        }
+    }
 </script>

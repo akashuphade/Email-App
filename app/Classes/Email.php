@@ -15,6 +15,7 @@ class Email
     private $pass;
     private $folder;
     
+    //Initialize the variables
     public function __construct()
     {   
         $this->server = SERVER;
@@ -63,10 +64,12 @@ class Email
         $emailIds = imap_search($this->conn, 'FROM "' . $fromEmail . '" '.$mailStatus);
         $emailData = [];
 
+        //If no emails then return empty array
         if (!$emailIds) {
             return $emailData;
         }
 
+        //Get the data for all emails
         foreach ($emailIds as $index => $email) {
                 
             $overview = imap_fetch_overview($this->conn, $email, 0);
@@ -77,7 +80,10 @@ class Email
         return $emailData;
     }
 
-    public function getFormattedData($emailMessage)
+    /**
+     * It will return the fomatted data required to show
+     */
+    public function getFormattedData(string $emailMessage)
     {
         $fieldNames = ["name", "email", "phone no", "address"];
         $finalData = [];
@@ -105,25 +111,40 @@ class Email
         return $finalData;
     }
 
-    public function markAsRead($msgNumbers) {
+    /**
+     * It will set the mails as read 
+     */
+    public function markAsRead(string $msgNumbers) {
         
         // Unset desired flag
         imap_setflag_full($this->conn, $msgNumbers, "\\Seen");
         
-        // colse the connection
+        // Confirm the deletion
         imap_expunge($this->conn);
-        imap_close($this->conn);
         
     }
 
+    /**
+     * It will set mails as unread
+     */
     public function markAsUnread($msgNumbers)
     {
         // Unset desired flag
         imap_clearflag_full($this->conn, $msgNumbers, "\\Seen");
         
-        // colse the connection
+        // Confirm the deletion
         imap_expunge($this->conn);
-        imap_close($this->conn);
 
+    }
+
+    /**
+     * It will move the mails to trash folder
+     */
+    public function deleteMails($msgNumbers)
+    {
+        imap_mail_move($this->conn, $msgNumbers, TRASH_FOLDER);
+
+        // Confirm the deletion
+        imap_expunge($this->conn);
     }
 }

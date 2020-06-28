@@ -19,11 +19,11 @@ require_once(dirname(__FILE__, 2) . "/ini/ini.php");
     <nav class="navbar navbar-dark bg-dark">
         <!-- Navbar content -->    
         <div class="row">
-            <a class="navbar-brand" href="<?php echo PathToUrl(BASE_PATH . '/unseenMails.php'); ?>">Email App</a>
+            <a class="navbar-brand" href="<?php echo PathToUrl(BASE_PATH . '/emails.php?action=unseen'); ?>">Email App</a>
                 
             <ul class="row nav-item">
-                <li class="nav-link"><a href="<?php echo PathToUrl(BASE_PATH . '/unseenMails.php'); ?>">Unread e-mails</a></li>
-                <li class="nav-link"><a href="<?php echo PathToUrl(BASE_PATH . '/seenMails.php'); ?>">Read e-mails</a></li>
+                <li class="nav-link"><a href="<?php echo PathToUrl(BASE_PATH . '/emails.php?action=unseen'); ?>">Unread e-mails</a></li>
+                <li class="nav-link"><a href="<?php echo PathToUrl(BASE_PATH . '/emails.php?action=seen'); ?>">Read e-mails</a></li>
             </ul>
         </div>
     </nav>
