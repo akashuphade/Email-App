@@ -1,6 +1,9 @@
 # Email-App
 This is php application which show you emails from your gmail Inbox and allows to read, unread and delete them.
 
+Pre-requisites:
+1. You should have imap php library installed and enabled on your system.
+
 Steps to use:
 1. Clone repository to your project
 2. install/update composer
